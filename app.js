@@ -3,10 +3,9 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID; // Set in env vars
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET; // Set in env vars
-const REDIRECT_URI = process.env.REDIRECT_URI || `http://localhost:${PORT}/callback`; // Update for production
+const CLIENT_ID = process.env.GITHUB_CLIENT_ID; // Set in Vercel env vars
+const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET; // Set in Vercel env vars
+const REDIRECT_URI = process.env.REDIRECT_URI || 'https://your-app-name.vercel.app/callback'; // Update with your Vercel URL
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -56,6 +55,4 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+module.exports = app;
