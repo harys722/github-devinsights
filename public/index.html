@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub DevInsights Dashboard</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="https://github-devinsights.vercel.app/favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -17,271 +17,613 @@
             background-color: #0d1117;
             color: #e6edf3;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
 
+        /* Enhanced Header with Animation */
         header {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 0;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border-radius: 12px;
+            margin-bottom: 50px;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f1419 100%);
+            border-radius: 16px;
             border: 1px solid #30363d;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 15px;
             color: #f0f6fc;
+            text-shadow: 0 2px 10px rgba(88, 166, 255, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         .subtitle {
             color: #8b949e;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Improved Login Section */
         .login-section {
             text-align: center;
-            margin: 60px 0;
+            margin: 80px 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .github-btn {
-            background: #238636;
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
             color: white;
             border: none;
-            padding: 16px 32px;
-            border-radius: 6px;
+            padding: 18px 36px;
+            border-radius: 8px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(35, 134, 54, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .github-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .github-btn:hover::before {
+            left: 100%;
         }
 
         .github-btn:hover {
-            background: #2ea043;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #2ea043 0%, #34d058 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(35, 134, 54, 0.4);
         }
 
+        /* Dashboard Layout */
         .dashboard {
             display: none;
+            animation: fadeIn 0.6s ease-out;
         }
 
         .dashboard.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Enhanced User Profile */
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 20px;
-            background: #161b22;
-            padding: 30px;
-            border-radius: 12px;
+            gap: 30px;
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+            padding: 40px;
+            border-radius: 16px;
             border: 1px solid #30363d;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-profile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #238636, #2ea043, #58a6ff, #1f6feb);
+            border-radius: 16px 16px 0 0;
         }
 
         .avatar {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            border: 3px solid #238636;
+            border: 4px solid #238636;
+            box-shadow: 0 0 30px rgba(35, 134, 54, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
         }
 
         .user-info h2 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
             color: #f0f6fc;
+            font-weight: 700;
         }
 
         .user-info .username {
             color: #58a6ff;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .user-bio {
+            color: #8b949e;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
         .user-stats {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 20px;
-            margin-top: 15px;
+            margin-top: 20px;
         }
 
         .stat {
-            background: #21262d;
-            padding: 10px 15px;
-            border-radius: 6px;
+            background: rgba(33, 38, 45, 0.8);
+            padding: 16px 20px;
+            border-radius: 12px;
             border: 1px solid #30363d;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat:hover {
+            background: rgba(33, 38, 45, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .stat-number {
-            font-weight: 600;
+            font-weight: 700;
             color: #f0f6fc;
+            font-size: 1.8rem;
+            display: block;
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #8b949e;
+            font-weight: 500;
+            margin-top: 4px;
         }
 
+        /* Enhanced Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .stat-card {
-            background: #161b22;
-            padding: 25px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+            padding: 30px;
+            border-radius: 16px;
             border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #f1e05a, #3572A5, #b07219, #2b7489);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            border-color: #58a6ff;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
         }
 
         .stat-card h3 {
             color: #f0f6fc;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .repo-list {
+        /* Language Stats Enhancement */
+        .language {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(33, 38, 45, 0.5);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .language:hover {
+            background: rgba(33, 38, 45, 0.8);
+            transform: translateX(4px);
+        }
+
+        .language-info {
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .repo-item {
-            background: #21262d;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #30363d;
+        .language-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .language-name {
+            color: #f0f6fc;
+            font-weight: 500;
+        }
+
+        .language-count {
+            color: #8b949e;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Activity Feed Enhancement */
+        .activity-item {
+            margin-bottom: 15px;
+            padding: 16px;
+            background: rgba(33, 38, 45, 0.6);
+            border-radius: 10px;
+            border-left: 4px solid #238636;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(33, 38, 45, 0.8);
+            transform: translateX(4px);
+        }
+
+        .activity-action {
+            color: #f0f6fc;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .activity-repo {
+            color: #58a6ff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            color: #8b949e;
+            font-size: 0.85rem;
+        }
+
+        /* Repository Cards */
+        .repo-list {
             display: flex;
-            justify-content: between;
-            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .repo-item {
+            background: rgba(33, 38, 45, 0.6);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .repo-item:hover {
+            background: rgba(33, 38, 45, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #58a6ff;
         }
 
         .repo-name {
             color: #58a6ff;
-            font-weight: 500;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
         }
 
         .repo-description {
             color: #8b949e;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
 
         .repo-meta {
             display: flex;
-            gap: 15px;
-            font-size: 0.85rem;
+            gap: 20px;
+            font-size: 0.9rem;
             color: #8b949e;
+            flex-wrap: wrap;
         }
 
-        .language {
+        .repo-meta > span {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
-        .language-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
+        /* Achievement Badges */
+        .achievement-badge {
+            margin-bottom: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(35, 134, 54, 0.1) 0%, rgba(46, 160, 67, 0.1) 100%);
+            border: 1px solid rgba(35, 134, 54, 0.3);
+            border-radius: 10px;
+            color: #f0f6fc;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
+        .achievement-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(35, 134, 54, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .achievement-badge:hover {
+            background: linear-gradient(135deg, rgba(35, 134, 54, 0.2) 0%, rgba(46, 160, 67, 0.2) 100%);
+            border-color: rgba(35, 134, 54, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .achievement-badge:hover::before {
+            left: 100%;
+        }
+
+        /* Controls */
+        .logout-btn {
+            background: linear-gradient(135deg, #21262d 0%, #30363d 100%);
+            color: #e6edf3;
+            border: 1px solid #30363d;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #30363d 0%, #484f58 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Loading and Error States */
         .loading {
             text-align: center;
             padding: 40px;
             color: #8b949e;
+            font-size: 1.1rem;
         }
 
         .error {
-            background: #da3633;
+            background: linear-gradient(135deg, #da3633 0%, #f85149 100%);
             color: white;
-            padding: 15px;
-            border-radius: 6px;
+            padding: 16px;
+            border-radius: 8px;
             margin: 20px 0;
             text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(218, 54, 51, 0.3);
         }
 
-        .logout-btn {
-            background: #21262d;
-            color: #e6edf3;
-            border: 1px solid #30363d;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            float: right;
-            margin-bottom: 20px;
+        .info-box {
+            background: linear-gradient(135deg, #0969da 0%, #1f6feb 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 20px rgba(9, 105, 218, 0.3);
         }
 
-        .logout-btn:hover {
-            background: #30363d;
+        .info-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
 
-        .contribution-graph {
-            background: #21262d;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .contrib-day {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            margin: 1px;
-            border-radius: 2px;
-            background: #161b22;
-        }
-
-        .contrib-1 { background: #0e4429; }
-        .contrib-2 { background: #006d32; }
-        .contrib-3 { background: #26a641; }
-        .contrib-4 { background: #39d353; }
-
+        /* Footer */
         footer {
             text-align: center;
-            padding: 20px;
-            color: #B9BBBE;
-            border-top: 1px solid #1f2937;
-            margin-top: 40px;
-            animation: fadeIn 1s ease-in;
+            padding: 40px 20px;
+            color: #8b949e;
+            border-top: 1px solid #21262d;
+            margin-top: 60px;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                padding: 40px 20px;
+                margin-bottom: 30px;
+            }
+
+            .user-profile {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 20px;
+                gap: 20px;
+            }
+            
+            .user-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .logout-btn {
+                float: none;
+                display: block;
+                margin: 0 auto 20px auto;
+            }
+
+            .repo-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .github-btn {
+                padding: 16px 28px;
+                font-size: 15px;
+            }
+
+            .stat-card h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 GitHub DevInsights Dashboard</h1>
-            <p class="subtitle">Explore your GitHub statistics and insights</p>
+            <h1>🚀 DevInsights Dashboard</h1>
+            <p class="subtitle">Explore your GitHub statistics and insights with beautiful visualizations</p>
         </header>
 
         <div class="login-section" id="loginSection">
-            <button class="github-btn" onclick="loginWithGitHub()">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <button class="github-btn" onclick="loginWithGitHub()" id="loginBtn">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                 </svg>
-                Connect with GitHub
+                Continue with GitHub
             </button>
-            <p style="margin-top: 20px; color: #8b949e;">
-                Sign in with your GitHub account to view your detailed statistics
+            
+            <p style="margin-top: 25px; color: #8b949e; font-size: 1rem;">
+                Sign in with your GitHub account to view your detailed statistics and insights
             </p>
         </div>
 
         <div class="dashboard" id="dashboard">
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <button class="logout-btn" onclick="logout()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 6px;">
+                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                </svg>
+                Logout
+            </button>
             <div style="clear: both;"></div>
             
             <div class="user-profile" id="userProfile">
@@ -290,91 +632,77 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <h3>📊 Repository Stats</h3>
-                    <div id="repoStats" class="loading">Loading...</div>
+                    <h3>📊 Repository Analytics</h3>
+                    <div id="repoStats" class="loading">Loading repository data...</div>
                 </div>
 
                 <div class="stat-card">
-                    <h3>🔥 Top Languages</h3>
-                    <div id="languageStats" class="loading">Loading...</div>
+                    <h3>🔥 Programming Languages</h3>
+                    <div id="languageStats" class="loading">Analyzing language usage...</div>
                 </div>
 
                 <div class="stat-card">
-                    <h3>⭐ Recent Activity</h3>
-                    <div id="activityStats" class="loading">Loading...</div>
+                    <h3>⚡ Recent Activity</h3>
+                    <div id="activityStats" class="loading">Fetching activity feed...</div>
                 </div>
 
                 <div class="stat-card">
                     <h3>🏆 Achievements</h3>
-                    <div id="achievements" class="loading">Loading...</div>
+                    <div id="achievements" class="loading">Calculating achievements...</div>
                 </div>
             </div>
 
             <div class="stat-card">
                 <h3>📁 Top Repositories</h3>
-                <div id="topRepos" class="loading">Loading repositories...</div>
+                <div id="topRepos" class="loading">Loading your best repositories...</div>
             </div>
         </div>
+
         <footer>
-            <p>© 2025 harys722. All rights reserved.</p>
+            <p>© 2025 harys722. All rights reserved. | Built with GitHub API</p>
         </footer>
     </div>
 
     <script>
-        // GitHub App Configuration
-        const CLIENT_ID = 'YOUR_GITHUB_APP_CLIENT_ID'; // Replace with your GitHub App Client ID
-        const REDIRECT_URI = window.location.origin;
-
         // State management
         let accessToken = localStorage.getItem('github_token');
         let userData = null;
 
+        // GitHub API helper
+        async function githubAPI(endpoint) {
+            const response = await fetch(`https://api.github.com${endpoint}`, {
+                headers: {
+                    'Authorization': `token ${accessToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            return response.json();
+        }
+
         // Initialize app
         window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            
-            if (code && !accessToken) {
-                exchangeCodeForToken(code);
-            } else if (accessToken) {
+            // Check for access token in hash (from callback redirect)
+            if (window.location.hash.startsWith('#access_token=')) {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash);
+                accessToken = params.get('access_token');
+                if (accessToken) {
+                    localStorage.setItem('github_token', accessToken);
+                    // Clear hash to hide token
+                    history.replaceState(null, null, ' ');
+                }
+            }
+
+            if (accessToken) {
                 showDashboard();
             }
         };
 
         function loginWithGitHub() {
-            const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user,repo,read:user`;
-            window.location.href = githubAuthUrl;
-        }
-
-        async function exchangeCodeForToken(code) {
-            try {
-                // In a real app, this should be done on your backend for security
-                const response = await fetch('https://github.com/login/oauth/access_token', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        client_id: CLIENT_ID,
-                        client_secret: 'YOUR_CLIENT_SECRET', // This should be on backend!
-                        code: code
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.access_token) {
-                    accessToken = data.access_token;
-                    localStorage.setItem('github_token', accessToken);
-                    window.history.replaceState({}, document.title, REDIRECT_URI);
-                    showDashboard();
-                } else {
-                    showError('Failed to authenticate with GitHub');
-                }
-            } catch (error) {
-                showError('Authentication error: ' + error.message);
-            }
+            window.location.href = '/login';
         }
 
         async function showDashboard() {
@@ -395,25 +723,29 @@
                     <div class="user-info">
                         <h2>${userData.name || userData.login}</h2>
                         <div class="username">@${userData.login}</div>
-                        <p style="color: #8b949e; margin-bottom: 15px;">${userData.bio || 'No bio available'}</p>
+                        <p class="user-bio">${userData.bio || 'No bio available - but the code speaks for itself! 🚀'}</p>
                         <div class="user-stats">
                             <div class="stat">
-                                <div class="stat-number">${userData.followers}</div>
+                                <span class="stat-number">${userData.followers || 0}</span>
                                 <div class="stat-label">Followers</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number">${userData.following}</div>
+                                <span class="stat-number">${userData.following || 0}</span>
                                 <div class="stat-label">Following</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number">${userData.public_repos}</div>
+                                <span class="stat-number">${userData.public_repos || 0}</span>
                                 <div class="stat-label">Repositories</div>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">${userData.public_gists || 0}</span>
+                                <div class="stat-label">Gists</div>
                             </div>
                         </div>
                     </div>
                 `;
             } catch (error) {
-                showError('Failed to load user data');
+                document.getElementById('userProfile').innerHTML = '<div class="error">Failed to load user data. Please try refreshing the page.</div>';
             }
         }
 
@@ -429,37 +761,43 @@
 
         async function loadRepoStats() {
             try {
-                const repos = await githubAPI('/user/repos?per_page=100');
+                const repos = await githubAPI('/user/repos?per_page=100&sort=updated');
                 const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
                 const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
+                const totalWatchers = repos.reduce((sum, repo) => sum + repo.watchers_count, 0);
+                const publicRepos = repos.filter(repo => !repo.private).length;
                 
                 document.getElementById('repoStats').innerHTML = `
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px;">
                         <div class="stat">
-                            <div class="stat-number">${repos.length}</div>
-                            <div class="stat-label">Total Repos</div>
+                            <span class="stat-number">${publicRepos}</span>
+                            <div class="stat-label">Public Repos</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-number">${totalStars}</div>
+                            <span class="stat-number">${totalStars}</span>
                             <div class="stat-label">Total Stars</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-number">${totalForks}</div>
+                            <span class="stat-number">${totalForks}</span>
                             <div class="stat-label">Total Forks</div>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">${totalWatchers}</span>
+                            <div class="stat-label">Watchers</div>
                         </div>
                     </div>
                 `;
             } catch (error) {
-                document.getElementById('repoStats').innerHTML = '<div class="error">Failed to load repository stats</div>';
+                document.getElementById('repoStats').innerHTML = '<div class="error">Failed to load repository statistics</div>';
             }
         }
 
         async function loadLanguageStats() {
             try {
-                const repos = await githubAPI('/user/repos?per_page=50');
+                const repos = await githubAPI('/user/repos?per_page=100');
                 const languages = {};
                 
-                for (const repo of repos.slice(0, 10)) { // Limit to avoid rate limiting
+                for (const repo of repos) {
                     if (repo.language) {
                         languages[repo.language] = (languages[repo.language] || 0) + 1;
                     }
@@ -467,7 +805,7 @@
                 
                 const sortedLanguages = Object.entries(languages)
                     .sort(([,a], [,b]) => b - a)
-                    .slice(0, 5);
+                    .slice(0, 6);
                 
                 const languageColors = {
                     JavaScript: '#f1e05a',
@@ -479,118 +817,224 @@
                     PHP: '#4F5D95',
                     Ruby: '#701516',
                     Go: '#00ADD8',
-                    Rust: '#dea584'
+                    Rust: '#dea584',
+                    'C++': '#f34b7d',
+                    C: '#555555',
+                    'C#': '#239120',
+                    Swift: '#ffac45',
+                    Kotlin: '#7F52FF'
                 };
                 
-                document.getElementById('languageStats').innerHTML = sortedLanguages.map(([lang, count]) => `
-                    <div class="language" style="margin-bottom: 10px;">
-                        <div class="language-dot" style="background: ${languageColors[lang] || '#8b949e'};"></div>
-                        <span style="color: #f0f6fc;">${lang}</span>
-                        <span style="margin-left: auto; color: #8b949e;">${count} repos</span>
-                    </div>
-                `).join('');
+                document.getElementById('languageStats').innerHTML = sortedLanguages.length > 0 
+                    ? sortedLanguages.map(([lang, count]) => `
+                        <div class="language">
+                            <div class="language-info">
+                                <div class="language-dot" style="background: ${languageColors[lang] || '#8b949e'};"></div>
+                                <span class="language-name">${lang}</span>
+                            </div>
+                            <span class="language-count">${count} repo${count > 1 ? 's' : ''}</span>
+                        </div>
+                    `).join('')
+                    : '<div style="color: #8b949e; text-align: center; padding: 20px;">No language data available</div>';
                 
             } catch (error) {
-                document.getElementById('languageStats').innerHTML = '<div class="error">Failed to load language stats</div>';
+                document.getElementById('languageStats').innerHTML = '<div class="error">Failed to load language statistics</div>';
             }
         }
 
         async function loadActivityStats() {
             try {
-                const events = await githubAPI('/users/' + userData.login + '/events?per_page=10');
-                const recentEvents = events.slice(0, 5);
+                const events = await githubAPI(`/users/${userData.login}/events?per_page=30`);
+                const recentEvents = events.slice(0, 8);
                 
-                document.getElementById('activityStats').innerHTML = recentEvents.map(event => {
-                    const date = new Date(event.created_at).toLocaleDateString();
-                    let action = event.type.replace('Event', '');
-                    
-                    return `
-                        <div style="margin-bottom: 12px; padding: 8px; background: #21262d; border-radius: 6px;">
-                            <div style="color: #f0f6fc; font-weight: 500;">${action}</div>
-                            <div style="color: #8b949e; font-size: 0.9rem;">${event.repo.name}</div>
-                            <div style="color: #8b949e; font-size: 0.85rem;">${date}</div>
-                        </div>
-                    `;
-                }).join('');
+                document.getElementById('activityStats').innerHTML = recentEvents.length > 0
+                    ? recentEvents.map(event => {
+                        const date = new Date(event.created_at);
+                        const timeAgo = getTimeAgo(date);
+                        let action = event.type.replace('Event', '').replace(/([A-Z])/g, ' $1').trim();
+                        let details = '';
+                        let emoji = '📝';
+                        
+                        if (event.payload && event.payload.commits) {
+                            details = ` - ${event.payload.commits.length} commit${event.payload.commits.length > 1 ? 's' : ''}`;
+                            emoji = '💻';
+                        } else if (event.payload && event.payload.issue) {
+                            details = ` - ${event.payload.action} issue #${event.payload.issue.number}`;
+                            emoji = '🐛';
+                        } else if (event.type === 'CreateEvent') {
+                            emoji = '✨';
+                        } else if (event.type === 'ForkEvent') {
+                            emoji = '🍴';
+                        } else if (event.type === 'WatchEvent') {
+                            emoji = '⭐';
+                        }
+                        
+                        return `
+                            <div class="activity-item">
+                                <div class="activity-action">${emoji} ${action}${details}</div>
+                                <div class="activity-repo">${event.repo.name}</div>
+                                <div class="activity-time">${timeAgo}</div>
+                            </div>
+                        `;
+                    }).join('')
+                    : '<div style="color: #8b949e; text-align: center; padding: 20px;">No recent activity found</div>';
                 
             } catch (error) {
-                document.getElementById('activityStats').innerHTML = '<div class="error">Failed to load activity</div>';
+                document.getElementById('activityStats').innerHTML = '<div class="error">Failed to load activity data</div>';
             }
         }
 
         async function loadAchievements() {
-            // Generate some fun achievements based on user data
-            const achievements = [];
-            
-            if (userData.public_repos > 10) achievements.push('🏗️ Repository Builder');
-            if (userData.followers > 50) achievements.push('👥 Community Leader');
-            if (userData.created_at && new Date() - new Date(userData.created_at) > 365 * 24 * 60 * 60 * 1000) {
-                achievements.push('🎂 Veteran Developer');
+            try {
+                const achievements = [];
+                
+                // Repository achievements
+                if (userData.public_repos > 5) achievements.push('🏗️ Repository Builder - Created over 5 repositories');
+                if (userData.public_repos > 25) achievements.push('💻 Prolific Developer - Created over 25 repositories');
+                if (userData.public_repos > 50) achievements.push('🚀 Code Machine - Created over 50 repositories');
+                
+                // Social achievements
+                if (userData.followers > 10) achievements.push('👥 Community Member - Over 10 followers');
+                if (userData.followers > 50) achievements.push('🌟 Rising Star - Over 50 followers');
+                if (userData.followers > 100) achievements.push('⭐ GitHub Celebrity - Over 100 followers');
+                
+                // Account age achievements
+                const accountAge = new Date() - new Date(userData.created_at);
+                const yearsOld = accountAge / (365 * 24 * 60 * 60 * 1000);
+                if (yearsOld > 1) achievements.push('🎂 Veteran Developer - Account over 1 year old');
+                if (yearsOld > 3) achievements.push('🏆 GitHub Veteran - Account over 3 years old');
+                if (yearsOld > 5) achievements.push('👑 GitHub Legend - Account over 5 years old');
+                
+                // Try to get additional stats
+                try {
+                    const repos = await githubAPI('/user/repos?per_page=100');
+                    const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+                    
+                    if (totalStars > 10) achievements.push('⭐ Star Collector - Repositories have over 10 total stars');
+                    if (totalStars > 50) achievements.push('🌟 Popular Developer - Repositories have over 50 total stars');
+                    if (totalStars > 100) achievements.push('💫 GitHub Star - Repositories have over 100 total stars');
+                    
+                    const languageCount = new Set(repos.filter(r => r.language).map(r => r.language)).size;
+                    if (languageCount > 3) achievements.push('🗣️ Polyglot - Uses more than 3 programming languages');
+                    if (languageCount > 7) achievements.push('🌍 Multi-Language Master - Uses more than 7 programming languages');
+                } catch (e) {
+                    console.log('Could not load additional stats for achievements');
+                }
+
+                // Add starter achievements if none exist
+                if (achievements.length === 0) {
+                    achievements.push('🎯 GitHub Explorer - Welcome to your developer journey!');
+                    achievements.push('👨‍💻 Code Enthusiast - Keep building amazing things!');
+                }
+
+                document.getElementById('achievements').innerHTML = achievements.map(achievement => `
+                    <div class="achievement-badge">${achievement}</div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('achievements').innerHTML = '<div class="error">Failed to load achievements</div>';
             }
-            achievements.push('🌟 GitHub Explorer');
-            achievements.push('💻 Code Enthusiast');
-            
-            document.getElementById('achievements').innerHTML = achievements.map(badge => 
-                `<div style="background: #21262d; padding: 10px; border-radius: 6px; margin-bottom: 8px;">${badge}</div>`
-            ).join('');
         }
 
         async function loadTopRepos() {
             try {
-                const repos = await githubAPI('/user/repos?sort=updated&per_page=5');
+                const repos = await githubAPI('/user/repos?per_page=10&sort=stargazers');
                 
-                document.getElementById('topRepos').innerHTML = repos.map(repo => `
-                    <div class="repo-item">
-                        <div style="flex: 1;">
-                            <div class="repo-name">${repo.name}</div>
-                            <div class="repo-description">${repo.description || 'No description available'}</div>
-                            <div class="repo-meta">
-                                ${repo.language ? `<div class="language">
-                                    <div class="language-dot" style="background: #f1e05a;"></div>
-                                    ${repo.language}
-                                </div>` : ''}
-                                <div>⭐ ${repo.stargazers_count}</div>
-                                <div>🍴 ${repo.forks_count}</div>
-                                <div>Updated ${new Date(repo.updated_at).toLocaleDateString()}</div>
+                document.getElementById('topRepos').innerHTML = repos.length > 0
+                    ? '<div class="repo-list">' + repos.map(repo => {
+                        const updatedDate = new Date(repo.updated_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        
+                        return `
+                            <div class="repo-item">
+                                <div style="flex: 1;">
+                                    <div class="repo-name">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 6px; opacity: 0.7;">
+                                            <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 0 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8zM5 12.25v3.25a.25.25 0 0 0 .4.2l1.45-1.087a.25.25 0 0 1 .3 0L8.6 15.7a.25.25 0 0 0 .4-.2v-3.25a.25.25 0 0 0-.25-.25h-3.5a.25.25 0 0 0-.25.25z"/>
+                                        </svg>
+                                        ${repo.name}
+                                    </div>
+                                    <div class="repo-description">${repo.description || 'No description available'}</div>
+                                    <div class="repo-meta">
+                                        ${repo.language ? `
+                                            <span style="display: flex; align-items: center; gap: 6px;">
+                                                <div class="language-dot" style="background: ${getLanguageColor(repo.language)}; width: 12px; height: 12px;"></div>
+                                                ${repo.language}
+                                            </span>
+                                        ` : ''}
+                                        <span>⭐ ${repo.stargazers_count}</span>
+                                        <span>🍴 ${repo.forks_count}</span>
+                                        <span>👀 ${repo.watchers_count}</span>
+                                        <span>📅 Updated ${updatedDate}</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                `).join('');
-                
+                        `;
+                    }).join('') + '</div>'
+                    : '<div style="color: #8b949e; text-align: center; padding: 40px;">No repositories found</div>';
             } catch (error) {
                 document.getElementById('topRepos').innerHTML = '<div class="error">Failed to load repositories</div>';
             }
         }
 
-        async function githubAPI(endpoint) {
-            const response = await fetch(`https://api.github.com${endpoint}`, {
-                headers: {
-                    'Authorization': `token ${accessToken}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`GitHub API error: ${response.status}`);
+        // Helper functions
+        function getLanguageColor(language) {
+            const colors = {
+                JavaScript: '#f1e05a',
+                Python: '#3572A5',
+                Java: '#b07219',
+                TypeScript: '#2b7489',
+                HTML: '#e34c26',
+                CSS: '#563d7c',
+                PHP: '#4F5D95',
+                Ruby: '#701516',
+                Go: '#00ADD8',
+                Rust: '#dea584',
+                'C++': '#f34b7d',
+                C: '#555555',
+                'C#': '#239120',
+                Swift: '#ffac45',
+                Kotlin: '#7F52FF',
+                Vue: '#4FC08D',
+                React: '#61DAFB',
+                Shell: '#89e051',
+                Dockerfile: '#384d54'
+            };
+            return colors[language] || '#8b949e';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / (1000 * 60));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            if (days > 0) {
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else if (minutes > 0) {
+                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            } else {
+                return 'Just now';
             }
-            
-            return response.json();
         }
 
         function logout() {
             localStorage.removeItem('github_token');
             accessToken = null;
-            userData = null;
-            document.getElementById('dashboard').classList.remove('active');
-            document.getElementById('loginSection').style.display = 'block';
+            window.location.reload();
         }
 
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
             errorDiv.textContent = message;
-            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('header').nextSibling);
-            
+            document.getElementById('loginSection').appendChild(errorDiv);
             setTimeout(() => errorDiv.remove(), 5000);
         }
     </script>
