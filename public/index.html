@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevInsights Dashboard</title>
+    <title>GitHub DevInsights Dashboard</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -164,7 +165,7 @@
             border-radius: 8px;
             border: 1px solid #30363d;
             display: flex;
-            justify-content: space-between;
+            justify-content: between;
             align-items: center;
         }
 
@@ -229,50 +230,51 @@
             background: #30363d;
         }
 
-        .info-box {
-            background: #0969da;
-            color: white;
+        .contribution-graph {
+            background: #21262d;
             padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
+            border-radius: 8px;
+            margin-top: 15px;
         }
 
-        .info-box strong {
-            display: block;
-            margin-bottom: 5px;
+        .contrib-day {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 1px;
+            border-radius: 2px;
+            background: #161b22;
         }
 
-        @media (max-width: 768px) {
-            .user-profile {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .user-stats {
-                justify-content: center;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        .contrib-1 { background: #0e4429; }
+        .contrib-2 { background: #006d32; }
+        .contrib-3 { background: #26a641; }
+        .contrib-4 { background: #39d353; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #B9BBBE;
+            border-top: 1px solid #1f2937;
+            margin-top: 40px;
+            animation: fadeIn 1s ease-in;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🚀 DevInsights Dashboard</h1>
+            <h1>🚀 GitHub DevInsights Dashboard</h1>
             <p class="subtitle">Explore your GitHub statistics and insights</p>
         </header>
 
         <div class="login-section" id="loginSection">
-            <button class="github-btn" onclick="loginWithGitHub()" id="loginBtn">
+            <button class="github-btn" onclick="loginWithGitHub()">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
                 </svg>
-                Continue with GitHub
+                Connect with GitHub
             </button>
-            
             <p style="margin-top: 20px; color: #8b949e;">
                 Sign in with your GitHub account to view your detailed statistics
             </p>
@@ -313,48 +315,66 @@
                 <div id="topRepos" class="loading">Loading repositories...</div>
             </div>
         </div>
+        <footer>
+            <p>© 2025 harys722. All rights reserved.</p>
+        </footer>
     </div>
 
     <script>
+        // GitHub App Configuration
+        const CLIENT_ID = 'YOUR_GITHUB_APP_CLIENT_ID'; // Replace with your GitHub App Client ID
+        const REDIRECT_URI = window.location.origin;
+
         // State management
         let accessToken = localStorage.getItem('github_token');
         let userData = null;
 
-        // GitHub API helper
-        async function githubAPI(endpoint) {
-            const response = await fetch(`https://api.github.com${endpoint}`, {
-                headers: {
-                    'Authorization': `token ${accessToken}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`GitHub API error: ${response.status}`);
-            }
-            return response.json();
-        }
-
         // Initialize app
         window.onload = function() {
-            // Check for access token in hash (from callback redirect)
-            if (window.location.hash.startsWith('#access_token=')) {
-                const hash = window.location.hash.substring(1);
-                const params = new URLSearchParams(hash);
-                accessToken = params.get('access_token');
-                if (accessToken) {
-                    localStorage.setItem('github_token', accessToken);
-                    // Clear hash to hide token
-                    history.replaceState(null, null, ' ');
-                }
-            }
-
-            if (accessToken) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            
+            if (code && !accessToken) {
+                exchangeCodeForToken(code);
+            } else if (accessToken) {
                 showDashboard();
             }
         };
 
         function loginWithGitHub() {
-            window.location.href = '/login';
+            const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=user,repo,read:user`;
+            window.location.href = githubAuthUrl;
+        }
+
+        async function exchangeCodeForToken(code) {
+            try {
+                // In a real app, this should be done on your backend for security
+                const response = await fetch('https://github.com/login/oauth/access_token', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_id: CLIENT_ID,
+                        client_secret: 'YOUR_CLIENT_SECRET', // This should be on backend!
+                        code: code
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.access_token) {
+                    accessToken = data.access_token;
+                    localStorage.setItem('github_token', accessToken);
+                    window.history.replaceState({}, document.title, REDIRECT_URI);
+                    showDashboard();
+                } else {
+                    showError('Failed to authenticate with GitHub');
+                }
+            } catch (error) {
+                showError('Authentication error: ' + error.message);
+            }
         }
 
         async function showDashboard() {
@@ -378,26 +398,22 @@
                         <p style="color: #8b949e; margin-bottom: 15px;">${userData.bio || 'No bio available'}</p>
                         <div class="user-stats">
                             <div class="stat">
-                                <div class="stat-number">${userData.followers || 0}</div>
+                                <div class="stat-number">${userData.followers}</div>
                                 <div class="stat-label">Followers</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number">${userData.following || 0}</div>
+                                <div class="stat-number">${userData.following}</div>
                                 <div class="stat-label">Following</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-number">${userData.public_repos || 0}</div>
+                                <div class="stat-number">${userData.public_repos}</div>
                                 <div class="stat-label">Repositories</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">${userData.public_gists || 0}</div>
-                                <div class="stat-label">Gists</div>
                             </div>
                         </div>
                     </div>
                 `;
             } catch (error) {
-                document.getElementById('userProfile').innerHTML = '<div class="error">Failed to load user data</div>';
+                showError('Failed to load user data');
             }
         }
 
@@ -413,10 +429,9 @@
 
         async function loadRepoStats() {
             try {
-                const repos = await githubAPI('/user/repos?per_page=100&sort=updated');
+                const repos = await githubAPI('/user/repos?per_page=100');
                 const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
                 const totalForks = repos.reduce((sum, repo) => sum + repo.forks_count, 0);
-                const totalWatchers = repos.reduce((sum, repo) => sum + repo.watchers_count, 0);
                 
                 document.getElementById('repoStats').innerHTML = `
                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
@@ -432,10 +447,6 @@
                             <div class="stat-number">${totalForks}</div>
                             <div class="stat-label">Total Forks</div>
                         </div>
-                        <div class="stat">
-                            <div class="stat-number">${totalWatchers}</div>
-                            <div class="stat-label">Total Watchers</div>
-                        </div>
                     </div>
                 `;
             } catch (error) {
@@ -445,10 +456,10 @@
 
         async function loadLanguageStats() {
             try {
-                const repos = await githubAPI('/user/repos?per_page=100');
+                const repos = await githubAPI('/user/repos?per_page=50');
                 const languages = {};
                 
-                for (const repo of repos) {
+                for (const repo of repos.slice(0, 10)) { // Limit to avoid rate limiting
                     if (repo.language) {
                         languages[repo.language] = (languages[repo.language] || 0) + 1;
                     }
@@ -468,23 +479,16 @@
                     PHP: '#4F5D95',
                     Ruby: '#701516',
                     Go: '#00ADD8',
-                    Rust: '#dea584',
-                    'C++': '#f34b7d',
-                    C: '#555555',
-                    'C#': '#239120'
+                    Rust: '#dea584'
                 };
                 
-                document.getElementById('languageStats').innerHTML = sortedLanguages.length > 0 
-                    ? sortedLanguages.map(([lang, count]) => `
-                        <div class="language" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div class="language-dot" style="background: ${languageColors[lang] || '#8b949e'};"></div>
-                                <span style="color: #f0f6fc;">${lang}</span>
-                            </div>
-                            <span style="color: #8b949e;">${count} repos</span>
-                        </div>
-                    `).join('')
-                    : '<div style="color: #8b949e;">No language data available</div>';
+                document.getElementById('languageStats').innerHTML = sortedLanguages.map(([lang, count]) => `
+                    <div class="language" style="margin-bottom: 10px;">
+                        <div class="language-dot" style="background: ${languageColors[lang] || '#8b949e'};"></div>
+                        <span style="color: #f0f6fc;">${lang}</span>
+                        <span style="margin-left: auto; color: #8b949e;">${count} repos</span>
+                    </div>
+                `).join('');
                 
             } catch (error) {
                 document.getElementById('languageStats').innerHTML = '<div class="error">Failed to load language stats</div>';
@@ -493,126 +497,100 @@
 
         async function loadActivityStats() {
             try {
-                const events = await githubAPI(`/users/${userData.login}/events?per_page=30`);
-                const recentEvents = events.slice(0, 10);
+                const events = await githubAPI('/users/' + userData.login + '/events?per_page=10');
+                const recentEvents = events.slice(0, 5);
                 
-                document.getElementById('activityStats').innerHTML = recentEvents.length > 0
-                    ? recentEvents.map(event => {
-                        const date = new Date(event.created_at).toLocaleString();
-                        let action = event.type.replace('Event', '').replace(/([A-Z])/g, ' $1').trim();
-                        let details = '';
-                        if (event.payload && event.payload.commits) {
-                            details = ` - ${event.payload.commits.length} commits`;
-                        } else if (event.payload && event.payload.issue) {
-                            details = ` - ${event.payload.action} issue #${event.payload.issue.number}`;
-                        }
-                        
-                        return `
-                            <div style="margin-bottom: 12px; padding: 8px; background: #21262d; border-radius: 6px;">
-                                <div style="color: #f0f6fc; font-weight: 500;">${action}${details}</div>
-                                <div style="color: #58a6ff; font-size: 0.9rem;">${event.repo.name}</div>
-                                <div style="color: #8b949e; font-size: 0.85rem;">${date}</div>
-                            </div>
-                        `;
-                    }).join('')
-                    : '<div style="color: #8b949e;">No recent activity found</div>';
+                document.getElementById('activityStats').innerHTML = recentEvents.map(event => {
+                    const date = new Date(event.created_at).toLocaleDateString();
+                    let action = event.type.replace('Event', '');
+                    
+                    return `
+                        <div style="margin-bottom: 12px; padding: 8px; background: #21262d; border-radius: 6px;">
+                            <div style="color: #f0f6fc; font-weight: 500;">${action}</div>
+                            <div style="color: #8b949e; font-size: 0.9rem;">${event.repo.name}</div>
+                            <div style="color: #8b949e; font-size: 0.85rem;">${date}</div>
+                        </div>
+                    `;
+                }).join('');
                 
             } catch (error) {
-                document.getElementById('activityStats').innerHTML = '<div class="error">Failed to load activity stats</div>';
+                document.getElementById('activityStats').innerHTML = '<div class="error">Failed to load activity</div>';
             }
         }
 
         async function loadAchievements() {
-            try {
-                const achievements = [];
-                
-                if (userData.public_repos > 10) achievements.push('🏗️ Repository Builder - Created over 10 repositories');
-                if (userData.public_repos > 50) achievements.push('💻 Prolific Developer - Created over 50 repositories');
-                if (userData.followers > 50) achievements.push('👥 Community Leader - Over 50 followers');
-                if (userData.followers > 100) achievements.push('🌟 Rising Star - Over 100 followers');
-                
-                const accountAge = new Date() - new Date(userData.created_at);
-                const yearsOld = accountAge / (365 * 24 * 60 * 60 * 1000);
-                if (yearsOld > 1) achievements.push('🎂 Veteran Developer - Account over 1 year old');
-                if (yearsOld > 5) achievements.push('🏆 GitHub Legend - Account over 5 years old');
-                
-                // Check for starred repos or other
-                const starred = await githubAPI('/user/starred?per_page=1');
-                if (starred.length > 0) achievements.push('⭐ Star Gazer - Has starred repositories');
-
-                document.getElementById('achievements').innerHTML = achievements.length > 0
-                    ? achievements.map(ach => `
-                        <div style="margin-bottom: 8px; padding: 8px; background: #21262d; border-radius: 6px; color: #f0f6fc;">
-                            ${ach}
-                        </div>
-                    `).join('')
-                    : '<div style="color: #8b949e;">No achievements unlocked yet</div>';
-            } catch (error) {
-                document.getElementById('achievements').innerHTML = '<div class="error">Failed to load achievements</div>';
+            // Generate some fun achievements based on user data
+            const achievements = [];
+            
+            if (userData.public_repos > 10) achievements.push('🏗️ Repository Builder');
+            if (userData.followers > 50) achievements.push('👥 Community Leader');
+            if (userData.created_at && new Date() - new Date(userData.created_at) > 365 * 24 * 60 * 60 * 1000) {
+                achievements.push('🎂 Veteran Developer');
             }
+            achievements.push('🌟 GitHub Explorer');
+            achievements.push('💻 Code Enthusiast');
+            
+            document.getElementById('achievements').innerHTML = achievements.map(badge => 
+                `<div style="background: #21262d; padding: 10px; border-radius: 6px; margin-bottom: 8px;">${badge}</div>`
+            ).join('');
         }
 
         async function loadTopRepos() {
             try {
-                const repos = await githubAPI('/user/repos?per_page=10&sort=stargazers');
+                const repos = await githubAPI('/user/repos?sort=updated&per_page=5');
                 
-                document.getElementById('topRepos').innerHTML = repos.length > 0
-                    ? '<div class="repo-list">' + repos.map(repo => {
-                        return `
-                            <div class="repo-item">
-                                <div>
-                                    <div class="repo-name">${repo.name}</div>
-                                    <div class="repo-description">${repo.description || 'No description'}</div>
-                                    <div class="repo-meta">
-                                        <span>⭐ ${repo.stargazers_count}</span>
-                                        <span>🍴 ${repo.forks_count}</span>
-                                        <span>👀 ${repo.watchers_count}</span>
-                                        <span>📅 Updated: ${new Date(repo.updated_at).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-                                <div class="language">
-                                    <div class="language-dot" style="background: ${getLanguageColor(repo.language)};"></div>
-                                    ${repo.language || 'Unknown'}
-                                </div>
+                document.getElementById('topRepos').innerHTML = repos.map(repo => `
+                    <div class="repo-item">
+                        <div style="flex: 1;">
+                            <div class="repo-name">${repo.name}</div>
+                            <div class="repo-description">${repo.description || 'No description available'}</div>
+                            <div class="repo-meta">
+                                ${repo.language ? `<div class="language">
+                                    <div class="language-dot" style="background: #f1e05a;"></div>
+                                    ${repo.language}
+                                </div>` : ''}
+                                <div>⭐ ${repo.stargazers_count}</div>
+                                <div>🍴 ${repo.forks_count}</div>
+                                <div>Updated ${new Date(repo.updated_at).toLocaleDateString()}</div>
                             </div>
-                        `;
-                    }).join('') + '</div>'
-                    : '<div style="color: #8b949e;">No repositories found</div>';
+                        </div>
+                    </div>
+                `).join('');
+                
             } catch (error) {
-                document.getElementById('topRepos').innerHTML = '<div class="error">Failed to load top repositories</div>';
+                document.getElementById('topRepos').innerHTML = '<div class="error">Failed to load repositories</div>';
             }
         }
 
-        function getLanguageColor(language) {
-            const colors = {
-                JavaScript: '#f1e05a',
-                Python: '#3572A5',
-                Java: '#b07219',
-                TypeScript: '#2b7489',
-                HTML: '#e34c26',
-                CSS: '#563d7c',
-                PHP: '#4F5D95',
-                Ruby: '#701516',
-                Go: '#00ADD8',
-                Rust: '#dea584',
-                'C++': '#f34b7d',
-                C: '#555555',
-                'C#': '#239120'
-            };
-            return colors[language] || '#8b949e';
+        async function githubAPI(endpoint) {
+            const response = await fetch(`https://api.github.com${endpoint}`, {
+                headers: {
+                    'Authorization': `token ${accessToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            
+            return response.json();
         }
 
         function logout() {
             localStorage.removeItem('github_token');
             accessToken = null;
-            window.location.reload();
+            userData = null;
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginSection').style.display = 'block';
         }
 
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
             errorDiv.textContent = message;
-            document.getElementById('loginSection').appendChild(errorDiv);
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('header').nextSibling);
+            
             setTimeout(() => errorDiv.remove(), 5000);
         }
     </script>
